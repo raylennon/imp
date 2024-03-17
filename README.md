@@ -1,0 +1,1 @@
+SDFs are awesome. So are sphere tracing and SDFs. Why not have both?
