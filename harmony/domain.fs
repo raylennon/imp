@@ -19,6 +19,6 @@ float domain(vec3 v) {
 
 float domain2(vec3 v, float t) {
   float s = 0.5;
-  float a = sin(s * (v.x)) * cos(s * (v.y-t)) + sin(s * (v.y-t)) * cos(s * v.z) + sin(s * v.z) * cos(s * (v.x)) -cos(t/2.0);
-  return max(-(v.y-2.0), a*a);
+  float a = sin(s * (v.x)) * cos(s * (v.y-t)) + sin(s * (v.y-t)) * cos(s * v.z) + sin(s * v.z) * cos(s * (v.x)) -0.3 * cos(t/5.0);
+  return max(-(v.y-2.0), a*a - 0.2);
 }

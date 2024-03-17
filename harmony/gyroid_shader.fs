@@ -71,7 +71,7 @@ for(int i = 0; i < MAX_STEPS; i++){
     loc = loc + step_fac*dir*domain2(loc,u_time);
   }
 
-  float val = exp(-0.05*dist)/1.0;
+  float val = exp(-0.001*pow(dist, 2.2))/1.0;
   // float val = 1.0;
   
     float gx = mod(loc.x, 3.1415926/2.0);
@@ -79,7 +79,7 @@ for(int i = 0; i < MAX_STEPS; i++){
     float gz = mod(loc.z,3.1415926/2.0);
     float bt = 0.1;
     if (( (-bt < gx && bt > gx) || (-bt < gy && bt > gy) || (-bt < gz && bt > gz) )) {
-    	val *= 0.95;
+    	val *= 1.0;
     }
 
   vec3 g = grad(loc);
