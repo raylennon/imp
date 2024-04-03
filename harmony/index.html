@@ -76,7 +76,18 @@
 
 	<script type="module" src="./graphics.js"></script>
 	<script type="module" src="/script.js"></script>
-
+	<script>
+		    document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('keydown', function (event) {
+            // Check if the pressed key is 'h'
+            if (event.key === 'h') {
+                var canvas = document.getElementById('webgl-canvas');
+                // Toggle visibility of the canvas
+                canvas.style.display = (canvas.style.display === 'none') ? 'block' : 'none';
+            }
+        });
+    });
+	</script>
 </body>
 
 </html>

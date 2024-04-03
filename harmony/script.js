@@ -4,6 +4,7 @@
 // Import OrbitControls.js for camera control
 import * as THREE from 'three';
 import { FlyControls } from 'three/addons/controls/FlyControls.js';
+import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 
 const scene = new THREE.Scene();
 window.sceneObjects = []
@@ -79,7 +80,7 @@ async function imageFragmentShader() {
 
         vec3 loc = sillyCamera;
         vec3 dir = (silly-sillyCamera);
-        dir *= 0.4/length(dir);
+        dir *= 1.0/length(dir);
         
         float val = 0.0;
         
@@ -139,7 +140,7 @@ async function fragmentShader() {
 
         vec3 loc = sillyCamera;
         vec3 dir = (silly-sillyCamera);
-        dir *= 0.4/length(dir);
+        dir *= 1.0/length(dir);
         
         float val = 0.0;
         
@@ -157,7 +158,7 @@ async function fragmentShader() {
                 steps=10000000.0;
                 break;  
             } else if (dot(silly-sillyCamera, silly-loc)<0.0) {
-                opacity = 0.5;
+                opacity = 1.0;
                 steps=10000000.0;
                 break;
             }
@@ -181,7 +182,8 @@ window.godMaterial = new THREE.ShaderMaterial({
     blendEquation : THREE.AddEquation 
   })
 
-const texture = new THREE.TextureLoader().load( "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Grosser_Panda.JPG/1280px-Grosser_Panda.JPG" );
+// const texture = new THREE.TextureLoader().load( "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Grosser_Panda.JPG/1280px-Grosser_Panda.JPG" );
+const texture = new THREE.TextureLoader().load( "https://i.imgur.com/bGqHJve.pngq" );
 texture.wrapS = THREE.RepeatWrapping;
 texture.wrapT = THREE.RepeatWrapping;
 texture.needsUpdate = true;
@@ -226,16 +228,17 @@ async function addImagePlane(location) {
     const material = imageMaterial.clone();
     const plane = new THREE.Mesh( geometry, material );
     plane.position.set(...location);
+    plane.rotateY(-3.141592/2.0);
     sceneObjects.push( plane );
   }
 
 
-await addExperimentalCube([0, 0, 0]);
-await addExperimentalCube([0, 0, 0]);
-await addExperimentalCube([12, 0, 0]);
-await addExperimentalCube([0, 12, 0]);
-await addExperimentalCube([0, 0, -12]);
-await addImagePlane([0, -12, 0]);
+// await addExperimentalCube([0, 0, 0]);
+// await addExperimentalCube([12, 0, -1]);
+// await addExperimentalCube([0, 12, -2]);
+// await addExperimentalCube([0, 0, -12]);
+await addImagePlane([19.5, 0, 0]);
+await addImagePlane([19.5, 0.0, -8.0]);
 
 
 
@@ -247,9 +250,15 @@ for (let i in sceneObjects) {
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Set up fly controls
 const controls = new FlyControls(camera, renderer.domElement);
-
-controls.movementSpeed = 5;
 controls.rollSpeed = 10 * Math.PI / 24;
+controls.movementSpeed = 5;
+
+
+// const controls = new FirstPersonControls(camera, renderer.domElement);
+// controls.lookSpeed = 0.2;
+// controls.lookVertical = false;
+// controls.movementSpeed = 10;
+
 controls.autoForward = false;
 controls.dragToLook = false;
 

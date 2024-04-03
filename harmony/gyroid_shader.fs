@@ -49,8 +49,8 @@ void main() {
   uv.x *= u_resolution.x/u_resolution.y;
   float time = u_time;
   
-  float MAX_DIST = 24.0;
-  const int MAX_STEPS = 60;
+  float MAX_DIST = 100.0;
+  const int MAX_STEPS = 120;
 
   vec3 loc = u_position.xzy;
   loc.y = -loc.y;
@@ -59,7 +59,7 @@ void main() {
   vec3 base_color = vec3(1.0, 1.0, 1.0);
   float dist = 0.0;
 
-  float step_fac = 0.6/length(dir);
+  float step_fac = 1.0/length(dir);
 
   float current_sign = sign(domain2(loc,u_time));
 
@@ -68,23 +68,25 @@ for(int i = 0; i < MAX_STEPS; i++){
       break;
     }
     dist += abs(step_fac * domain2(loc,u_time));
-    loc = loc + step_fac*dir*domain2(loc,u_time);
+    loc = loc + step_fac*dir*abs(domain2(loc,u_time));
   }
 
-  float val = exp(-0.001*pow(dist, 2.2))/1.0;
+  float val = exp(-0.0001*pow(dist, 2.2))/1.0;
   // float val = 1.0;
   
     float gx = mod(loc.x, 3.1415926/2.0);
     float gy = mod(loc.y, 3.1415926/2.0);
     float gz = mod(loc.z,3.1415926/2.0);
     float bt = 0.1;
-    if (( (-bt < gx && bt > gx) || (-bt < gy && bt > gy) || (-bt < gz && bt > gz) )) {
-    	val *= 1.0;
-    }
+    // if (loc.z<-4.99) {
+        if (( (-bt < gx && bt > gx) || (-bt < gy && bt > gy) || (-bt < gz && bt > gz) )) {
+          val *= 0.9;
+        }
+    // }q
 
   vec3 g = grad(loc);
-
+  // val = 1.0-val;
   float val1 = 0.5;
-  float val2 = 0.5;//(g.x +2.0)/2.0;
+  float val2 = 0.25*g.x+0.75;
   gl_FragColor = vec4(val*val2, val*val2, val*val2, 1.0);
   }

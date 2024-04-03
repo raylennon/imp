@@ -20,8 +20,8 @@ class GraphicsRenderer {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
 
-    this.gl.canvas.width = this.canvas.clientWidth / 2;
-    this.gl.canvas.height = this.canvas.clientHeight / 2;
+    this.gl.canvas.width = this.canvas.clientWidth / 1;
+    this.gl.canvas.height = this.canvas.clientHeight / 1;
 
     this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
     this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
