@@ -62,7 +62,7 @@
 			background-color: rgba(1, 1, 1, 0.2);
 		}
 	</style>
-  <script type="module" crossorigin src="./assets/index-BC-iLQE5.js"></script>
+  <script type="module" crossorigin src="./assets/index-D974QXnj.js"></script>
 </head>
 
 <body>
@@ -75,7 +75,18 @@
 
 	<script src="https://cdn.jsdelivr.net/npm/gl-matrix@3.4.3/gl-matrix-min.min.js"></script>
 
-
+	<script>
+		    document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('keydown', function (event) {
+            // Check if the pressed key is 'h'
+            if (event.key === 'h') {
+                var canvas = document.getElementById('webgl-canvas');
+                // Toggle visibility of the canvas
+                canvas.style.display = (canvas.style.display === 'none') ? 'block' : 'none';
+            }
+        });
+    });
+	</script>
 </body>
 
 </html>
