@@ -4,6 +4,7 @@ uniform vec3 u_position;\r
 uniform float u_time;\r
 uniform float u_FL;\r
 \r
+// uniform vec4 bingus;\r
 uniform sampler2D matcapTexture; // Your matcap texture\r
 \r
 \r
@@ -42,7 +43,6 @@ vec3 grad (vec3 v) {\r
   g = g/length(g);\r
   return g;\r
 }\r
-\r
 void main() {\r
 \r
   vec2 uv = 2.0* gl_FragCoord.xy / u_resolution - 1.0;\r
@@ -54,6 +54,9 @@ void main() {\r
 \r
   vec3 loc = u_position.xzy;\r
   loc.y = -loc.y;\r
+  \r
+  \r
+  \r
   vec3 dir =  vec3(uv.x, (u_resolution.x/u_resolution.y) * (u_FL/35.0)*2.0 , uv.y) * rot;\r
 \r
   vec3 base_color = vec3(1.0, 1.0, 1.0);\r
@@ -71,7 +74,7 @@ for(int i = 0; i < MAX_STEPS; i++){\r
     loc = loc + step_fac*dir*abs(domain2(loc,u_time));\r
   }\r
 \r
-  float val = exp(-0.0001*pow(dist, 2.2))/1.0;\r
+  float val = exp(-0.001*pow(dist, 2.2))/1.0;\r
   // float val = 1.0;\r
   \r
     float gx = mod(loc.x, 3.1415926/2.0);\r
@@ -88,5 +91,12 @@ for(int i = 0; i < MAX_STEPS; i++){\r
   // val = 1.0-val;\r
   float val1 = 0.5;\r
   float val2 = 0.25*g.x+0.75;\r
+  vec2 bingus = matcap(dir, g);\r
+  \r
   gl_FragColor = vec4(val*val2, val*val2, val*val2, 1.0);\r
-  }`;export{r as default};
+\r
+  // gl_FragColor = vec4(texture2D(\r
+  //   matcapTexture, bingus\r
+  // ).rgb, 1.0);\r
+\r
+ }`;export{r as default};
