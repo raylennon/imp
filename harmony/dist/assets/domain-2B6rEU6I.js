@@ -8,7 +8,10 @@ const n=`precision mediump float;\r
 // 	}\r
 //   return a;\r
 // }\r
-\r
+float sdSphere( vec3 p, float s )\r
+{\r
+  return length( p ) - s;\r
+}\r
 float sdBox( vec3 p, vec3 b )\r
 {\r
 \r
@@ -47,10 +50,10 @@ float domain2(vec3 v, float t) {\r
       -min(sdBox(vec3(v.x+20.0,mod(min(v.y, 16.1)+1.0, 6.0)-3.0,(v.z-2.0)), vec3(3.0, 2.0, 5.0)), sdCappedCylinder(vec3(v.x+20.0,mod(min(v.y, 16.1)+1.0, 6.0)-3.0,v.z-7.0), 3.0, 2.0))\r
     ),\r
       max(\r
-        -sdPlane(v, vec4(0.0,-1.0,0.0,-20.0)),\r
+        -sdBox(v-vec3(0.0,0.0,10.0), vec3(30.0,30.0,15.0)),\r
         smin(\r
           smin(\r
-            0.2*(pow(trippy(1.0*v.xzy, 0.0),2.0)),\r
+            0.1*(pow(trippy(1.0*v.xzy,0.0 ),2.0)-0.05),\r
             sdPlane(v, vec4(0.0,0.0,1.0,5.0)),\r
             1.0\r
           ),\r
