@@ -21,7 +21,7 @@ float sdBox( vec3 p, vec3 b )
 float trippy(vec3 v, float t)
 {
   float s = 0.4;
-  float a = sin(s * (v.x)) * cos(s * (v.y-t)) + sin(s * (v.y-t)) * cos(s * v.z) + sin(s * v.z) * cos(s * (v.x)) -0.3 * cos(t/5.0);
+  float a = sin(s * (v.x)) * cos(s * (v.y)) + sin(s * (v.y)) * cos(s * (v.z-t)) + sin(s * (v.z-t)) * cos(s * (v.x)) -0.3 * cos(t/5.0);
   return a;
 }
 float sdCappedCylinder( vec3 p, float h, float r )
@@ -53,7 +53,7 @@ float domain2(vec3 v, float t) {
         -sdBox(v-vec3(0.0,0.0,10.0), vec3(30.0,30.0,15.0)),
         smin(
           smin(
-            0.1*(pow(trippy(1.0*v.xzy,0.0 ),2.0)-0.05),
+            0.1*(pow(trippy(1.0*v.xzy,t ),2.0)-0.05),
             sdPlane(v, vec4(0.0,0.0,1.0,5.0)),
             1.0
           ),
