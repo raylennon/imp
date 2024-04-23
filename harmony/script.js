@@ -248,13 +248,13 @@ async function addImagePlane(location, rotation, texpath, sx=3, sy=2) {
 
 await addImagePlane([0, 10, -25], [0, 0, 0], "WELCOME.png",30, 20);
 
-await addImagePlane([32, 3, -2-3*3.1415], [0, -3.141592/2, 0], "robert.png",3,3);
-await addImagePlane([32+3.1415/0.4, 3+3.1415/0.4, -2-3*3.1415-3.1415/0.4], [0, -3.141592/2, 0], "robert.png",3,3);
+await addImagePlane([32, 3, -2-3*3.1415], [0, -3.141592/2, 0], "https://upload.wikimedia.org/wikipedia/en/thumb/a/a3/Escher%27s_Relativity.jpg/270px-Escher%27s_Relativity.jpg",3,3);
+await addImagePlane([32+3.1415/0.4, 3+3.1415/0.4, -2-3*3.1415-3.1415/0.4], [0, -3.141592/2, 0], "https://upload.wikimedia.org/wikipedia/en/thumb/3/33/Study_of_Regular_Division_of_the_Plane_with_Reptiles.jpg/220px-Study_of_Regular_Division_of_the_Plane_with_Reptiles.jpg",3,3);
 
-await addImagePlane([32, 3, -2+2.5*3.1415], [0, -3.141592/2, 0], "robert.png",3,3);
-await addImagePlane([32+3.1415/0.4, 3+3.1415/0.4, -2+2.5*3.1415-3.1415/0.4], [0, -3.141592/2, 0], "robert.png",3,3);
+await addImagePlane([32, 3, -2+2.5*3.1415], [0, -3.141592/2, 0], "https://upload.wikimedia.org/wikipedia/en/2/28/Escher_Poster_Dulwich_Picture_Gallery_2015.jpg",2,3);
+await addImagePlane([32+3.1415/0.4, 3+3.1415/0.4, -2+2.5*3.1415-3.1415/0.4], [0, -3.141592/2, 0], "https://upload.wikimedia.org/wikipedia/en/b/ba/DrawingHands.jpg",3,3);
 
-await addImagePlane([32, 3, -2+2.5*3.1415+2*3.1415/0.4], [0, -3.141592/2, 0], "robert.png",3,3);
+await addImagePlane([32, 3, -2+2.5*3.1415+2*3.1415/0.4], [0, -3.141592/2, 0], "https://upload.wikimedia.org/wikipedia/en/0/03/Escher_Puddle.jpg",3,3);
 
 // await addImagePlane([19.5, 0.0, -8.0]);
 
