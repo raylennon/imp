@@ -83,7 +83,7 @@ async function imageFragmentShader() {
         dir *= 1.0/length(dir);
         
         float val = 0.0;
-        
+        float dist=0.0;
         float current_sign = sign(domain2(silly, u_time));
         float camera_sign = sign(domain2(sillyCamera, u_time));
 
@@ -102,10 +102,12 @@ async function imageFragmentShader() {
                 break;
             }
             loc += dir * abs(val);
+            dist += abs(val);
             steps +=1.0;
         }
         gl_FragColor = texture(uTexture, UV);
-        gl_FragColor.w = opacity;
+        gl_FragColor.xyz *= exp(-0.0002*pow(dist, 2.2))/1.0;
+        gl_FragColor.w *= opacity;
     }`
 }
 async function fragmentShader() {
@@ -183,14 +185,15 @@ window.godMaterial = new THREE.ShaderMaterial({
   })
 
 // const texture = new THREE.TextureLoader().load( "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Grosser_Panda.JPG/1280px-Grosser_Panda.JPG" );
-const texture = new THREE.TextureLoader().load( "https://i.imgur.com/bGqHJve.pngq" );
-texture.wrapS = THREE.RepeatWrapping;
-texture.wrapT = THREE.RepeatWrapping;
-texture.needsUpdate = true;
+// const texture = new THREE.TextureLoader().load( "https://i.imgur.com/bGqHJve.pngq" );
+// const texture = new THREE.TextureLoader().load( "WELCOME.png" );
+// texture.wrapS = THREE.RepeatWrapping;
+// texture.wrapT = THREE.RepeatWrapping;
+// texture.needsUpdate = true;
 
 window.imageMaterial = new THREE.ShaderMaterial({
     uniforms: {
-        uTexture: new THREE.Uniform(texture),
+        uTexture: null,
         cameraLoc: {type: 'vec3', value: camera.position.toArray()},
         u_time: {type: 'float', value: performance.now() / 1000.0}
     },
@@ -205,7 +208,8 @@ window.imageMaterial = new THREE.ShaderMaterial({
 // cube.position.set(0, 0, 0);
 
 // Set initial camera position and orientation
-camera.position.set(0, 0, 10); // Moved the camera further back to ensure the cube is within its field of view
+camera.position.set(4, 5, 0); // Moved the camera further back to ensure the cube is within its field of view
+// camera.rotation.y -= 3.141592/2.0;
 // camera.lookAt(cube.position);
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // WEIRD BUSINESS
@@ -222,23 +226,37 @@ async function addExperimentalCube(location) {
     sceneObjects.push(coolCube)
     console.log(sceneObjects[sceneObjects.length-1]);
   }
-async function addImagePlane(location) {
+async function addImagePlane(location, rotation, texpath, sx=3, sy=2) {
   
-    let geometry = new THREE.PlaneGeometry(5,5);
     const material = imageMaterial.clone();
+    var fac = 1.0;
+    var tex = new THREE.TextureLoader().load( texpath, function ( tex ) {
+        return
+        // fac=tex.image.width/tex.image.height;
+    } );
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.needsUpdate = true;
+    material.uniforms.uTexture = new THREE.Uniform(tex);
+    let geometry = new THREE.PlaneGeometry(sx,sy);
     const plane = new THREE.Mesh( geometry, material );
     plane.position.set(...location);
-    plane.rotateY(-3.141592/2.0);
+    plane.rotation.set(...rotation);
     sceneObjects.push( plane );
   }
 
 
-// await addExperimentalCube([0, 0, 0]);
-// await addExperimentalCube([12, 0, -1]);
-// await addExperimentalCube([0, 12, -2]);
-// await addExperimentalCube([0, 0, -12]);
-await addImagePlane([19.5, 0, 0]);
-await addImagePlane([19.5, 0.0, -8.0]);
+await addImagePlane([0, 10, -25], [0, 0, 0], "WELCOME.png",30, 20);
+
+await addImagePlane([32, 3, -2-3*3.1415], [0, -3.141592/2, 0], "robert.png",3,3);
+await addImagePlane([32+3.1415/0.4, 3+3.1415/0.4, -2-3*3.1415-3.1415/0.4], [0, -3.141592/2, 0], "robert.png",3,3);
+
+await addImagePlane([32, 3, -2+2.5*3.1415], [0, -3.141592/2, 0], "robert.png",3,3);
+await addImagePlane([32+3.1415/0.4, 3+3.1415/0.4, -2+2.5*3.1415-3.1415/0.4], [0, -3.141592/2, 0], "robert.png",3,3);
+
+await addImagePlane([32, 3, -2+2.5*3.1415+2*3.1415/0.4], [0, -3.141592/2, 0], "robert.png",3,3);
+
+// await addImagePlane([19.5, 0.0, -8.0]);
 
 
 

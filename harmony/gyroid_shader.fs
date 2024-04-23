@@ -4,6 +4,7 @@ uniform vec3 u_position;
 uniform float u_time;
 uniform float u_FL;
 
+// uniform vec4 bingus;
 uniform sampler2D matcapTexture; // Your matcap texture
 
 
@@ -42,7 +43,6 @@ vec3 grad (vec3 v) {
   g = g/length(g);
   return g;
 }
-
 void main() {
 
   vec2 uv = 2.0* gl_FragCoord.xy / u_resolution - 1.0;
@@ -54,6 +54,9 @@ void main() {
 
   vec3 loc = u_position.xzy;
   loc.y = -loc.y;
+  
+  
+  
   vec3 dir =  vec3(uv.x, (u_resolution.x/u_resolution.y) * (u_FL/35.0)*2.0 , uv.y) * rot;
 
   vec3 base_color = vec3(1.0, 1.0, 1.0);
@@ -71,7 +74,7 @@ for(int i = 0; i < MAX_STEPS; i++){
     loc = loc + step_fac*dir*abs(domain2(loc,u_time));
   }
 
-  float val = exp(-0.0001*pow(dist, 2.2))/1.0;
+  float val = exp(-0.001*pow(dist, 2.2))/1.0;
   // float val = 1.0;
   
     float gx = mod(loc.x, 3.1415926/2.0);
@@ -88,5 +91,12 @@ for(int i = 0; i < MAX_STEPS; i++){
   // val = 1.0-val;
   float val1 = 0.5;
   float val2 = 0.25*g.x+0.75;
+  vec2 bingus = matcap(dir, g);
+  
   gl_FragColor = vec4(val*val2, val*val2, val*val2, 1.0);
-  }
+
+  // gl_FragColor = vec4(texture2D(
+  //   matcapTexture, bingus
+  // ).rgb, 1.0);
+
+ }

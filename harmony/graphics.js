@@ -135,7 +135,8 @@ class GraphicsRenderer {
       this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, image);
       this.gl.generateMipmap(this.gl.TEXTURE_2D); // Optionally generate mipmaps
     };
-    image.src = './657274_2A2F30_A0A7B0_363C44-128px.png'; // Replace this with your texture's path
+    // image.src = './657274_2A2F30_A0A7B0_363C44-128px.png'; // Replace this with your texture's path
+    image.src = './robert.png'; // Replace this with your texture's path
 
     this.matcapTextureLocation = this.gl.getUniformLocation(this.program, 'matcapTexture');
     this.gl.uniform1i(this.matcapTextureLocation, 0); // Use texture unit 0
