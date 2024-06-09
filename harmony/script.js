@@ -3,8 +3,8 @@
 
 // Import OrbitControls.js for camera control
 import * as THREE from 'three';
-import { FlyControls } from 'three/addons/controls/FlyControls.js';
-import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
+import { FlyControls } from './controls.js';
+import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
 
 const scene = new THREE.Scene();
 window.sceneObjects = []
@@ -19,6 +19,15 @@ window.viewQuat = new THREE.Quaternion();
 const clock = new THREE.Clock();
 
 const renderer = new THREE.WebGLRenderer({canvas: document.getElementById('three-canvas'), alpha: true});
+
+// var threecanvas = document.getElementById('three-canvas');
+// const windowWidth = threecanvas.clientWidth;
+// const windowHeight = threecanvas.clientHeight;
+// renderer.setSize(windowWidth/5, windowHeight/5, false);
+// camera.updateProjectionMatrix();
+
+renderer.setPixelRatio( 1/5);
+
 
 renderer.setClearColor(0xffffff); // Black background
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -36,9 +45,17 @@ scene.background = null;
 
 function vertexShader() {
     return `
+
     varying vec3 vUv; 
     varying vec2 UV; 
+
+
+    // attribute vec3 normal;
+    // uniform mat4 normalMatrix;
+
+
     varying vec3 vposition;
+    varying vec3 v_normal;
 
     void main() {
       vUv = position; 
@@ -46,130 +63,78 @@ function vertexShader() {
       vposition = (modelMatrix * vec4(position, 1.0)).xyz;
 
       vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);
+    
+      v_normal = normal;
+
       gl_Position = projectionMatrix * modelViewPosition; 
     }
   `
 }
-async function imageFragmentShader() {
-    // const domainResponse = await fetch('./domain.fs',  { credentials: true });
-    // const domainText = await domainResponse.text();
-    const domainText = (await import('./domain.fs?raw')).default;
-    return `
-
-    uniform sampler2D uTexture;
-    uniform vec3 cameraLoc;
-    uniform float u_time; 
-    varying vec3 vposition;
-    varying vec2 UV;
-    varying vec3 vUv;`+`\n`+domainText+`\n
-
-    vec3 silly;
-    vec3 sillyCamera;
-    void main() {
-        sillyCamera = cameraLoc.xzy;
-        sillyCamera.y = -sillyCamera.y;
-
-        silly = vposition.xzy/1.0;
-        silly.y = -silly.y;
-
-        // float opacity = sign(domain2(silly, u_time));
-        
-        float opacity = 0.0;
-        
-        float steps = 0.0;
-
-        vec3 loc = sillyCamera;
-        vec3 dir = (silly-sillyCamera);
-        dir *= 1.0/length(dir);
-        
-        float val = 0.0;
-        float dist=0.0;
-        float current_sign = sign(domain2(silly, u_time));
-        float camera_sign = sign(domain2(sillyCamera, u_time));
-
-        if (current_sign != camera_sign) {
-            steps=1000000000.0;
-        }
-        while (steps < 100.0) {
-            val = domain2(loc, u_time);
-            if (sign(val) != camera_sign) {
-                opacity = 0.0;
-                steps=10000000.0;
-                break;  
-            } else if (dot(silly-sillyCamera, silly-loc)<0.0) {
-                opacity = 1.0;
-                steps=10000000.0;
-                break;
-            }
-            loc += dir * abs(val);
-            dist += abs(val);
-            steps +=1.0;
-        }
-        gl_FragColor = texture(uTexture, UV);
-        gl_FragColor.xyz *= exp(-0.0002*pow(dist, 2.2))/1.0;
-        gl_FragColor.w *= opacity;
-    }`
-}
 async function fragmentShader() {
-    // const domainResponse = await fetch('./domain.fs');
-    // const domainText = await domainResponse.text();
+
     const domainText = (await import('./domain.fs?raw')).default;
+    const visualText = (await import('./visual.fs?raw')).default;
     return `
-
-
-    uniform vec3 colorA;
-    uniform vec3 colorB; 
+    
     uniform vec3 cameraLoc; 
     uniform float u_time; 
 
     varying vec3 vposition;
     varying vec3 vUv;`+`\n`+domainText+`\n
+    varying vec3 v_normal;
 
-    vec3 silly;
+    vec3 v_position;
     vec3 sillyCamera;
+
     void main() {
         sillyCamera = cameraLoc.xzy;
         sillyCamera.y = -sillyCamera.y;
 
-        silly = vposition.xzy/1.0;
-        silly.y = -silly.y;
+        v_position = vposition.xzy/1.0;
+        v_position.y = -v_position.y;
 
-        // float opacity = sign(domain2(silly, u_time));
+        // float opacity = sign(domain2(v_position, u_time));
         
         float opacity = 0.0;
         
         float steps = 0.0;
 
         vec3 loc = sillyCamera;
-        vec3 dir = (silly-sillyCamera);
-        dir *= 1.0/length(dir);
         
+        vec3 dir = (v_position-sillyCamera);
+        dir *= 1.0/length(dir);
+        float step_fac = 1.0;
+        
+
         float val = 0.0;
         
-        float current_sign = sign(domain2(silly, u_time));
+        float current_sign = sign(domain2(v_position, u_time));
         float camera_sign = sign(domain2(sillyCamera, u_time));
 
         if (current_sign != camera_sign) {
             steps=1000000000.0;
         }
-
+        float dist =0.0;
         while (steps < 100.0) {
             val = domain2(loc, u_time);
             if (sign(val) != camera_sign) {
                 opacity = 0.0;
                 steps=10000000.0;
                 break;  
-            } else if (dot(silly-sillyCamera, silly-loc)<0.0) {
+            } else if (dot(v_position-sillyCamera, v_position-loc)<0.0) {
                 opacity = 1.0;
                 steps=10000000.0;
                 break;
             }
-            loc += dir * abs(val);
+            dist += abs(val);
+            loc += step_fac * dir * abs(val);
             steps +=1.0;
         }
-        // float opacity = sign(domain2(silly, u_time));
-        gl_FragColor = vec4((silly/3.0+1.0)/2.0, opacity);
-    }`
+
+        dist = length(cameraLoc-vposition);
+        gl_FragColor = vec4(1,1,1, opacity);
+        gl_FragColor.w = opacity;
+        `+`\n`+visualText
 }
 window.godMaterial = new THREE.ShaderMaterial({
     uniforms: {
@@ -184,36 +149,6 @@ window.godMaterial = new THREE.ShaderMaterial({
     blendEquation : THREE.AddEquation 
   })
 
-// const texture = new THREE.TextureLoader().load( "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Grosser_Panda.JPG/1280px-Grosser_Panda.JPG" );
-// const texture = new THREE.TextureLoader().load( "https://i.imgur.com/bGqHJve.pngq" );
-// const texture = new THREE.TextureLoader().load( "WELCOME.png" );
-// texture.wrapS = THREE.RepeatWrapping;
-// texture.wrapT = THREE.RepeatWrapping;
-// texture.needsUpdate = true;
-
-window.imageMaterial = new THREE.ShaderMaterial({
-    uniforms: {
-        uTexture: null,
-        cameraLoc: {type: 'vec3', value: camera.position.toArray()},
-        u_time: {type: 'float', value: performance.now() / 1000.0}
-    },
-    side: THREE.DoubleSide,
-    fragmentShader: await imageFragmentShader(),
-    vertexShader: vertexShader(),
-    blending: THREE.CustomBlending,
-    blendEquation : THREE.AddEquation 
-  })
-
-// Set initial cube position
-// cube.position.set(0, 0, 0);
-
-// Set initial camera position and orientation
-camera.position.set(4, 5, 0); // Moved the camera further back to ensure the cube is within its field of view
-// camera.rotation.y -= 3.141592/2.0;
-// camera.lookAt(cube.position);
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// WEIRD BUSINESS
-
 async function addExperimentalCube(location) {
   
     let geometry = new THREE.BoxGeometry(4,4,4)
@@ -221,43 +156,37 @@ async function addExperimentalCube(location) {
   
     var coolCube = new THREE.Mesh(geometry, material);
     coolCube.position.set(...location);
-    console.log(coolCube.position);
-    // coolCube.position.x = 2;
+    // console.log(coolCube.position);
     sceneObjects.push(coolCube)
-    console.log(sceneObjects[sceneObjects.length-1]);
-  }
-async function addImagePlane(location, rotation, texpath, sx=3, sy=2) {
-  
-    const material = imageMaterial.clone();
-    var fac = 1.0;
-    var tex = new THREE.TextureLoader().load( texpath, function ( tex ) {
-        return
-        // fac=tex.image.width/tex.image.height;
-    } );
-    tex.wrapS = THREE.RepeatWrapping;
-    tex.wrapT = THREE.RepeatWrapping;
-    tex.needsUpdate = true;
-    material.uniforms.uTexture = new THREE.Uniform(tex);
-    let geometry = new THREE.PlaneGeometry(sx,sy);
-    const plane = new THREE.Mesh( geometry, material );
-    plane.position.set(...location);
-    plane.rotation.set(...rotation);
-    sceneObjects.push( plane );
+    // console.log(sceneObjects[sceneObjects.length-1]);
   }
 
+// for (var i=-10; i<10; i++) {
+//     await addExperimentalCube([0,10*i,-30]);
 
-await addImagePlane([0, 10, -25], [0, 0, 0], "WELCOME.png",30, 20);
+// }
 
-await addImagePlane([32, 3, -2-3*3.1415], [0, -3.141592/2, 0], "https://upload.wikimedia.org/wikipedia/en/thumb/a/a3/Escher%27s_Relativity.jpg/270px-Escher%27s_Relativity.jpg",3,3);
-await addImagePlane([32+3.1415/0.4, 3+3.1415/0.4, -2-3*3.1415-3.1415/0.4], [0, -3.141592/2, 0], "https://upload.wikimedia.org/wikipedia/en/thumb/3/33/Study_of_Regular_Division_of_the_Plane_with_Reptiles.jpg/220px-Study_of_Regular_Division_of_the_Plane_with_Reptiles.jpg",3,3);
-
-await addImagePlane([32, 3, -2+2.5*3.1415], [0, -3.141592/2, 0], "https://upload.wikimedia.org/wikipedia/en/2/28/Escher_Poster_Dulwich_Picture_Gallery_2015.jpg",2,3);
-await addImagePlane([32+3.1415/0.4, 3+3.1415/0.4, -2+2.5*3.1415-3.1415/0.4], [0, -3.141592/2, 0], "https://upload.wikimedia.org/wikipedia/en/b/ba/DrawingHands.jpg",3,3);
-
-await addImagePlane([32, 3, -2+2.5*3.1415+2*3.1415/0.4], [0, -3.141592/2, 0], "https://upload.wikimedia.org/wikipedia/en/0/03/Escher_Puddle.jpg",3,3);
-
-// await addImagePlane([19.5, 0.0, -8.0]);
-
+// const loader = new STLLoader();
+// loader.load('./ship.stl', function (geometry) {
+//     // const material q= new THREE.MeshBasicMaterial( { color: 0x009900, wireframe: true });
+//     const material = godMaterial.clone();
+//     const mesh = new THREE.Mesh(geometry, material);
+//     mesh.translateX(10);
+//     mesh.translateZ(-30);
+//     mesh.translateY(-8);
+//     sceneObjects.push( mesh );
+//     scene.add(mesh);
+// });
+// loader.load('./RaceCourse.stl', function (geometry) {
+//     // const material q= new THREE.MeshBasicMaterial( { color: 0x009900, wireframe: true });
+//     const material = godMaterial.clone();
+//     const mesh = new THREE.Mesh(geometry, material);
+//     mesh.translateX(10);
+//     mesh.translateZ(-30);
+//     mesh.translateY(-8);
+//     sceneObjects.push( mesh );
+//     scene.add(mesh);
+// });
 
 
 for (let i in sceneObjects) {
@@ -265,20 +194,20 @@ for (let i in sceneObjects) {
     scene.add(sceneObjects[i]);
 }
 
+
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Set up fly controls
 const controls = new FlyControls(camera, renderer.domElement);
 controls.rollSpeed = 10 * Math.PI / 24;
-controls.movementSpeed = 5;
-
-
-// const controls = new FirstPersonControls(camera, renderer.domElement);
-// controls.lookSpeed = 0.2;
-// controls.lookVertical = false;
-// controls.movementSpeed = 10;
+controls.movementSpeed = 15;
 
 controls.autoForward = false;
 controls.dragToLook = false;
+
+camera.rotation.set(0, 3.1415/2, 0);
+
+console.log(camera.position);
+console.log(camera.rotation);
 
 // Function to handle window resize
 function onWindowResize() {
@@ -287,8 +216,11 @@ function onWindowResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 window.addEventListener('resize', onWindowResize, false);
-console.log(camera.getFocalLength());
+// console.log(camera.getFocalLength());
 // Function to render the scene
+
+
+
 function animate() {
     // coolCube.position.z -= 0.02;
     requestAnimationFrame(animate);

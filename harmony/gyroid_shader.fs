@@ -1,11 +1,27 @@
+out vec4 fragColor;
+
 uniform vec2 u_resolution;
 uniform vec4 u_orientation;
 uniform vec3 u_position;
 uniform float u_time;
 uniform float u_FL;
 
-// uniform vec4 bingus;
-uniform sampler2D matcapTexture; // Your matcap texture
+uniform sampler2D matcapTexture; 
+
+float softshadow( in vec3 ro, in vec3 rd, float mint, float maxt, float k )
+{
+    float res = 1.0;
+    float tstep = mint;
+    for( int i=0; i<256 && tstep<maxt; i++ )
+    {
+        float h = domain2(ro + rd*tstep, u_time);
+        if( h<0.001 )
+            return 0.0;
+        res = min( res, k*h/tstep );
+        tstep += h;
+    }
+    return res;
+}
 
 
 float udBox( vec3 p, vec3 b )
@@ -18,18 +34,6 @@ vec2 matcap(vec3 eye, vec3 normal) {
   float m = 2.8284271247461903 * sqrt( abs(reflected.y)+1.0 );
   return reflected.xz / m + 0.5;
 }
-
-float or = u_orientation.w;
-float ox = u_orientation.x;
-float oz = u_orientation.y;
-float oy = -u_orientation.z;
-float s = 1.0 / (or*or + ox*ox + oy*oy + oz*oz);
-
-mat3 rot = mat3(
-    1.0 - 2.0*s*(oy*oy+oz*oz), 2.0 * s * (ox*oy - oz*or), 2.0 * s * (ox*oz + oy*or),
-		2.0 * s * (ox*oy + oz*or), 1.0 - 2.0*s*(ox*ox+oz*oz), 2.0 * s * (oy*oz - ox*or),
-		2.0 * s * (ox*oz - oy*or), 2.0 * s * (oy*oz + ox*or), 1.0 - 2.0*s*(ox*ox+oy*oy)
-);
 
 vec3 grad (vec3 v) {
   float e = 0.001;
@@ -45,58 +49,58 @@ vec3 grad (vec3 v) {
 }
 void main() {
 
+  float or = u_orientation.w;
+  float ox = u_orientation.x;
+  float oz = u_orientation.y;
+  float oy = -u_orientation.z;
+  float s = 1.0 / (or*or + ox*ox + oy*oy + oz*oz);
+
+  mat3 rot = mat3(
+      1.0 - 2.0*s*(oy*oy+oz*oz), 2.0 * s * (ox*oy - oz*or), 2.0 * s * (ox*oz + oy*or),
+      2.0 * s * (ox*oy + oz*or), 1.0 - 2.0*s*(ox*ox+oz*oz), 2.0 * s * (oy*oz - ox*or),
+      2.0 * s * (ox*oz - oy*or), 2.0 * s * (oy*oz + ox*or), 1.0 - 2.0*s*(ox*ox+oy*oy)
+  );
+
   vec2 uv = 2.0* gl_FragCoord.xy / u_resolution - 1.0;
   uv.x *= u_resolution.x/u_resolution.y;
   float time = u_time;
   
   float MAX_DIST = 100.0;
-  const int MAX_STEPS = 120;
+  const int MAX_STEPS = 100;
 
   vec3 loc = u_position.xzy;
   loc.y = -loc.y;
   
-  
-  
   vec3 dir =  vec3(uv.x, (u_resolution.x/u_resolution.y) * (u_FL/35.0)*2.0 , uv.y) * rot;
 
-  vec3 base_color = vec3(1.0, 1.0, 1.0);
   float dist = 0.0;
-
   float step_fac = 1.0/length(dir);
-
   float current_sign = sign(domain2(loc,u_time));
 
 for(int i = 0; i < MAX_STEPS; i++){
     if (sign(domain2(loc,u_time)) != current_sign) {
       break;
     }
-    dist += abs(step_fac * domain2(loc,u_time));
+    dist += abs(domain2(loc,u_time));
     loc = loc + step_fac*dir*abs(domain2(loc,u_time));
   }
 
-  float val = exp(-0.001*pow(dist, 2.2))/1.0;
-  // float val = 1.0;
+  vec3 v_normal = grad(loc);
+  vec3 v_position = loc;
+  v_normal = v_normal.xzy;
+  v_normal.z = -v_normal.z;
+
+  // vec3 blendWeights = abs(v_normal);
+  // blendWeights /= (blendWeights.x + blendWeights.y + blendWeights.z);
+
+  // vec4 colorX = texture(matcapTexture, v_position.yz/10.0);
+  // vec4 colorY = texture(matcapTexture, v_position.zx/10.0);
+  // vec4 colorZ = texture(matcapTexture, v_position.xy/10.0);
+
+  // vec4 triplanarColor = colorX * blendWeights.x + colorY * blendWeights.y + colorZ * blendWeights.z;
   
-    float gx = mod(loc.x, 3.1415926/2.0);
-    float gy = mod(loc.y, 3.1415926/2.0);
-    float gz = mod(loc.z,3.1415926/2.0);
-    float bt = 0.1;
-    // if (loc.z<-4.99) {
-        if (( (-bt < gx && bt > gx) || (-bt < gy && bt > gy) || (-bt < gz && bt > gz) )) {
-          val *= 0.9;
-        }
-    // }q
-
-  vec3 g = grad(loc);
-  // val = 1.0-val;
-  float val1 = 0.5;
-  float val2 = 0.25*g.x+0.75;
-  vec2 bingus = matcap(dir, g);
+  fragColor = vec4(1.0, 1.0, 1.0, 1.0);
+  fragColor.xyz -= 0.0*v_normal;
   
-  gl_FragColor = vec4(val*val2, val*val2, val*val2, 1.0);
-
-  // gl_FragColor = vec4(texture2D(
-  //   matcapTexture, bingus
-  // ).rgb, 1.0);
-
- }
+  //  fragColor.xyz = triplanarColor.xyz;
+  // the color parts get modified by visual.fs

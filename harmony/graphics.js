@@ -5,7 +5,7 @@ window.vec3 = glMatrix.vec3;
 class GraphicsRenderer {
   constructor(canvasId, fragmentShaderPath) {
     this.canvas = document.getElementById(canvasId);
-    this.gl = this.canvas.getContext('webgl');
+    this.gl = this.canvas.getContext('webgl2');
 
     if (!this.gl) {
       console.error('Unable to initialize WebGL. Your browser may not support it.');
@@ -20,16 +20,17 @@ class GraphicsRenderer {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
 
-    this.gl.canvas.width = this.canvas.clientWidth / 1;
-    this.gl.canvas.height = this.canvas.clientHeight / 1;
+    this.gl.canvas.width = this.canvas.clientWidth / 5;
+    this.gl.canvas.height = this.canvas.clientHeight / 5;
 
     this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
     this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
   }
 
   async loadShaders(fragmentShaderPath) {
-    const vertexShaderSource = `
-        attribute vec2 a_position;
+    const vertexShaderSource = 
+        `#version 300 es
+        in vec2 a_position;
         void main() {
           gl_Position = vec4(a_position, 0.0, 1.0);
         }
@@ -114,7 +115,7 @@ class GraphicsRenderer {
     this.gl.uniform4fv(this.orientationUniformLocation, [1.0, 0.0, 1.0, 0.0]);
 
     this.focalLengthUniformLocation = this.gl.getUniformLocation(this.program, 'u_FL');
-    this.gl.uniform1f(this.focalLengthUniformLocation, [12.0]);
+    this.gl.uniform1f(this.focalLengthUniformLocation, [22.0]);
 
     this.positionUniformLocation = this.gl.getUniformLocation(this.program, 'u_position');
     this.gl.uniform3fv(this.positionUniformLocation, [0.0, 1.0, 0.0]);
@@ -135,8 +136,8 @@ class GraphicsRenderer {
       this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, image);
       this.gl.generateMipmap(this.gl.TEXTURE_2D); // Optionally generate mipmaps
     };
-    // image.src = './657274_2A2F30_A0A7B0_363C44-128px.png'; // Replace this with your texture's path
-    image.src = './robert.png'; // Replace this with your texture's path
+
+    image.src = './moon2.png'; // Replace this with your texture's path
 
     this.matcapTextureLocation = this.gl.getUniformLocation(this.program, 'matcapTexture');
     this.gl.uniform1i(this.matcapTextureLocation, 0); // Use texture unit 0
@@ -177,17 +178,16 @@ async function loadShaderFiles() {
   // const shader1Response = await fetch('./domain.fs');
   // const shader1Text = await shader1Response.text();
   const shader1Text = (await import('./domain.fs?raw')).default;
-  
-  // const shader2Response = await fetch('./gyroid_shader.fs');
-  // const shader2Text = await shader2Response.text();
   const shader2Text = (await import('./gyroid_shader.fs?raw')).default;
+  const shader3Text = (await import('./visual.fs?raw')).default;
 
   // Combine the shader code from both files
-  const combinedShaderCode = shader1Text + '\n' + shader2Text;
+  const combinedShaderCode = shader1Text + '\n' + shader2Text + '\n' + shader3Text;
     // console.log(shader2Text);
 
   return combinedShaderCode;
 }
+
 window.startGraphics = async function () {
   try {
     // Load both shader files and combine them

@@ -1,13 +1,6 @@
+#version 300 es
 precision mediump float;
 
-// float domain(vec3 v) {
-//   float s = 0.5;
-//   float a = sin(s * v.x) * cos(s * v.y) + sin(s * v.y) * cos(s * v.z) + sin(s * v.z) * cos(s * v.x);
-//   if (v.y < 2.0) {
-// 		return a-v.y + 2.0;
-// 	}
-//   return a;
-// }
 float sdSphere( vec3 p, float s )
 {
   return length( p ) - s;
@@ -22,6 +15,7 @@ float trippy(vec3 v, float t)
 {
   float s = 0.4;
   float a = sin(s * (v.x)) * cos(s * (v.y)) + sin(s * (v.y)) * cos(s * (v.z-t)) + sin(s * (v.z-t)) * cos(s * (v.x)) -0.3 * cos(t/5.0);
+  // a = cos(s*v.x) + cos(s*v.y)+cos(s*v.z);
   return a;
 }
 float sdCappedCylinder( vec3 p, float h, float r )
@@ -42,25 +36,23 @@ float smin(float a, float b, float k) {
 
 
 float domain2(vec3 v, float t) {
-  return 
-    min(
-      max(
-            max(-sdBox(v-vec3(10.0,10.0,15.0), vec3(30.0, 60.0, 20.0)), sdBox(v-vec3(0.0,0.0,5.0), vec3(21.0, 21.0, 11.0))), // room
-          
-      -min(sdBox(vec3(v.x+20.0,mod(min(v.y, 16.1)+1.0, 6.0)-3.0,(v.z-2.0)), vec3(3.0, 2.0, 5.0)), sdCappedCylinder(vec3(v.x+20.0,mod(min(v.y, 16.1)+1.0, 6.0)-3.0,v.z-7.0), 3.0, 2.0))
-    ),
-      max(
-        -sdBox(v-vec3(0.0,0.0,10.0), vec3(30.0,30.0,15.0)),
-        smin(
-          smin(
-            0.1*(pow(trippy(1.0*v.xzy,t ),2.0)-0.05),
-            sdPlane(v, vec4(0.0,0.0,1.0,5.0)),
-            1.0
-          ),
-          sdPlane(v, vec4(0.0,0.0,-1.0,20.0)),
-          1.0
-        )
+  float trip = 1.0*(trippy(3.3*v.xzy,t));
+  float tripbig = 1.0*(trippy(0.3*v.xzy,0.3*t));
 
-      )
-    );
+ 
+  float val1 = -min(trip+0.6, 0.6-trip);
+  // float val1 = trip;
+
+  float val2 = -min(tripbig+0.6, 0.6-tripbig);
+
+  return -smin(smin(-val1, -val2, 2.2), -sdSphere(v-vec3(-60.0,0.0,0.0), 35.0), 3.0);
+  // return -smin(-val1, -val2, 2.2);
+}
+float domain(vec3 v, float t) {
+  float val1 = -smin(
+        -sdSphere(v-vec3(0.0,60.0,0.0), 35.0),
+          -1.0*(trippy(1.3*v.xzy,1.0)-0.15), 1.0
+      );
+  return val1;
+
 }
