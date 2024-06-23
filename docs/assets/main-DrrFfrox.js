@@ -3835,11 +3835,11 @@ void main() {
 
       gl_Position = projectionMatrix * modelViewPosition; 
     }
-  `}async function vp(){const i=(await Cn(()=>import("./preamble-D53N6GXT.js"),__vite__mapDeps([]),import.meta.url)).default,e=(await Cn(()=>import("./utilities-D3pNeCxP.js"),__vite__mapDeps([]),import.meta.url)).default,t=(await Cn(()=>import("./domain-r507HN0l.js"),__vite__mapDeps([]),import.meta.url)).default;return i+`
+  `}window.generateFragmentShader=async function(i){const e=(await Cn(()=>import("./preamble-D53N6GXT.js"),__vite__mapDeps([]),import.meta.url)).default,t=(await Cn(()=>import("./utilities-D3pNeCxP.js"),__vite__mapDeps([]),import.meta.url)).default;return e+`
     varying vec3 vposition;
     varying vec3 vUv;
-`+e+`
 `+t+`
+`+i+`
 
     varying vec3 v_normal;
     varying vec4 vPos;
@@ -3897,4 +3897,4 @@ void main() {
         dir = -dir;
         dist = length(u_position-vposition);
         fragColor = vec4(vec3(0.5), opacity);
-        }`}window.godMaterial=new $t({uniforms:{colorB:{type:"vec3",value:new ke(11319013)},colorA:{type:"vec3",value:new ke(7662549)},u_position:{type:"vec3",value:mn.position.toArray()},u_time:{type:"float",value:performance.now()/1e3}},fragmentShader:await vp(),vertexShader:gp(),blending:ja,glslVersion:Qr,blendEquation:on});const xp=30,Mp=10,us=new pp(xp,Mp);us.material=window.godMaterial;cs.add(us);window.sceneObjects.push(us);const Ro=new _p(mn,gn.domElement);mn.position.z=20;Ro.update();function Sp(){mn.aspect=window.innerWidth/window.innerHeight,mn.updateProjectionMatrix(),gn.setSize(window.innerWidth,window.innerHeight)}window.addEventListener("resize",Sp,!1);function Co(){requestAnimationFrame(Co),Ro.update(),gn.render(cs,mn);for(let i in sceneObjects)Object.hasOwn(sceneObjects[i].material,"uniforms")&&(sceneObjects[i].material.uniforms.u_position.value=mn.position.toArray(),sceneObjects[i].material.uniforms.u_time.value=performance.now()/1e3)}Co();
+        }`};window.godMaterial=new $t({uniforms:{colorB:{type:"vec3",value:new ke(11319013)},colorA:{type:"vec3",value:new ke(7662549)},u_position:{type:"vec3",value:mn.position.toArray()},u_time:{type:"float",value:performance.now()/1e3}},fragmentShader:await window.generateFragmentShader((await Cn(()=>import("./domain-r507HN0l.js"),__vite__mapDeps([]),import.meta.url)).default),vertexShader:gp(),blending:ja,glslVersion:Qr,blendEquation:on});const vp=30,xp=10,us=new pp(vp,xp);us.material=window.godMaterial;cs.add(us);window.sceneObjects.push(us);const Ro=new _p(mn,gn.domElement);mn.position.z=20;Ro.update();function Mp(){mn.aspect=window.innerWidth/window.innerHeight,mn.updateProjectionMatrix(),gn.setSize(window.innerWidth,window.innerHeight)}window.addEventListener("resize",Mp,!1);function Co(){requestAnimationFrame(Co),Ro.update(),gn.render(cs,mn);for(let i in sceneObjects)Object.hasOwn(sceneObjects[i].material,"uniforms")&&(sceneObjects[i].material.uniforms.u_position.value=mn.position.toArray(),sceneObjects[i].material.uniforms.u_time.value=performance.now()/1e3)}Co();
