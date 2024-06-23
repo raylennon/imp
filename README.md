@@ -1,3 +1,20 @@
-Triangles are awesome. So are sphere tracing and SDFs. Why not have both?  
+# Imp-3D: Implicit 3D Modeling in Your Browser
 
-Reminder to self: do `git subtree push --prefix harmony/dist origin gh-pages` periodically to keep the GitHub Page up-to-date. 
+SDF-powered implicit solid modeling has many benefits; simplicity, elegance, guarantees of watertightness, precision, and the capacity to natively represent organic, hierarchical, or otherwise complex geometries.
+
+## Goals
+* Primitive modeling 
+    * Sphere
+    * Cube
+    * Cylinder
+* Boolean operations
+    * Join
+    * Intersect
+    * Difference
+* Visibility
+    * Cross-sectional view
+    * Orthogonal/ perspective
+    * Surface normal coloring
+* I/O
+    * Import STL or functional representation
+    * Export STL or functional representation
