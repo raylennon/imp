@@ -4,7 +4,7 @@ import { defineConfig } from 'vite'
 export default defineConfig ({
     build: {
       target: 'esnext',
-        outDir: '../dist',
+        outDir: '../docs',
         // target: 'esnext',
         rollupOptions: {
             input: {
