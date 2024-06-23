@@ -52,11 +52,11 @@ function vertexShader() {
     }
   `
 }
-async function fragmentShader() {
+window.generateFragmentShader = async function (domainText) {
 
     const preambleText = (await import('../shaders/preamble.fs?raw')).default;
     const utilitiesText = (await import('../shaders/utilities.fs?raw')).default;
-    const domainText = (await import('../shaders/domain.fs?raw')).default;
+    // const domainText = (await import('../shaders/domain.fs?raw')).default;
     return preambleText+`
     varying vec3 vposition;
     varying vec3 vUv;`+`\n`+utilitiesText+`\n`+domainText+`\n
@@ -125,7 +125,7 @@ window.godMaterial = new THREE.ShaderMaterial({
         u_position: {type: 'vec3', value: camera.position.toArray()},
         u_time: {type: 'float', value: performance.now() / 1000.0}
     },
-    fragmentShader: await fragmentShader(),
+    fragmentShader: await window.generateFragmentShader((await import('../shaders/domain.fs?raw')).default),
     vertexShader: vertexShader(),
     blending: THREE.CustomBlending,
     glslVersion: THREE.GLSL3,
@@ -161,7 +161,7 @@ function animate() {
     for (let i in sceneObjects) {
         if (Object.hasOwn(sceneObjects[i].material, 'uniforms')) {
             sceneObjects[i].material.uniforms.u_position.value = camera.position.toArray();
-            sceneObjects[i].material.uniforms.u_time.value =performance.now() / 1000.0;
+            sceneObjects[i].material.uniforms.u_time.value = performance.now() / 1000.0;
         }
     }
 }

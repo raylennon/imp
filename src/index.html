@@ -86,6 +86,7 @@
 
 		function handleEntryChange() {
 			window.updateShader(); // Call your updateShader function here
+			// console.log(window.generateFragmentShader(document.getElementById('entry').textContent));
 		}
 
 		// Select the 'entry' div
@@ -93,20 +94,20 @@
 
 		// Create a new MutationObserver
 		const observer = new MutationObserver(function (mutations) {
-			mutations.forEach(function (mutation) {
+			mutations.forEach(async function (mutation) {
 				if (mutation.type === 'childList' || mutation.type === 'characterData') {
 					// Call handleEntryChange whenever content changes
 					handleEntryChange();
+					window.godMaterial.fragmentShader = await window.generateFragmentShader(document.getElementById('entry').textContent);
+					window.godMaterial.needsUpdate=true;
 				}
 			});
 		});
 
 		// Configure the observer to watch for changes in 'entry' div
 		const observerConfig = { childList: true, subtree: true, characterData: true };
-
 		// Start observing the target node for configured mutations
 		observer.observe(entryDiv, observerConfig);
-
 
 		window.addEventListener('load', async () => {
 			const dynamicShaderPart = document.getElementById('entry').textContent;
