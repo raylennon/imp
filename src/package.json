@@ -1,0 +1,21 @@
+{
+  "name": "harmony",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "nodemon": "^3.1.4",
+    "serve-favicon": "^2.5.0",
+    "three": "^0.162.0"
+  },
+  "devDependencies": {
+    "vite": "^5.1.6"
+  }
+}
