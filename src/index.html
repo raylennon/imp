@@ -3,7 +3,7 @@
 
 <head>
 	<meta charset="utf-8">
-	<title>Triangle Harmony</title>
+	<title>Imp-3D Modeller</title>
 	<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
 	<style>
 		html {
@@ -33,7 +33,7 @@
 			/* background-color: rgba(54, 54, 54, 0.206); */
 			color: darkgray;
 			font-family: 'Roboto', sans-serif;
-			font-size: x-large;
+			font-size: large;
 
 			border: none !important;
 
@@ -52,9 +52,9 @@
 			position: absolute;
 			width: 25%;
 			/* height: 80%; */
-			z-index: 100;
-			top: 5%;
-			left: 5%
+			z-index: 5;
+			top: 22%;
+			left: 2%
 				/* visibility: hidden; */
 		}
 
@@ -63,23 +63,13 @@
 			outline: none;
 		}
 
-		#update-shader-button {
-			position: absolute;
-			z-index: 100;
-			right: 0;
-		}
-
-		#update-shader-button:hover {
-			background: rgb(180, 180, 180);
-		}
 	</style>
 </head>
 
 <body>
 	<canvas id="webgl-canvas"></canvas>
 	<canvas id="three-canvas"></canvas>
-	<button id="update-shader-button">Update Shader</button>
-
+	<img src="IMP_LOGO_WHITE.png" style="position: absolute;height: 15%; top: 5%;left: 2%;">
 	<div id="entry" contenteditable="true">
 		<pre>float domain(vec3 v, float t) {
 			float val1 = sphere(v-vec3(0.0,0.0,0.0), 4.0);
@@ -89,9 +79,9 @@
 
 	<script src="https://cdn.jsdelivr.net/npm/gl-matrix@3.4.3/gl-matrix-min.min.js"></script>
 
-	<script type="module" src="../js/graphics.js"></script>
-	<script type="module" src="../js/controls.js"></script>
-	<script type="module" src="../js/script.js"></script>
+	<script type="module" src="./js/graphics.js"></script>
+	<script type="module" src="./js/controls.js"></script>
+	<script type="module" src="./js/script.js"></script>
 	<script>
 
 		function handleEntryChange() {
