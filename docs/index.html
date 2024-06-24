@@ -14,7 +14,7 @@
 			margin: 0;
 			min-height: 100%;
 			background-color: transparent !important;
-			background-image: radial-gradient(rgb(46, 46, 46), black);
+			background-image: radial-gradient(rgb(59, 59, 59), rgb(4, 4, 4));
 		}
 
 		canvas {
@@ -53,7 +53,7 @@
 			width: 25%;
 			/* height: 80%; */
 			z-index: 5;
-			top: 22%;
+			top: 15%;
 			left: 2%
 				/* visibility: hidden; */
 		}
@@ -62,15 +62,14 @@
 			color: white;
 			outline: none;
 		}
-
 	</style>
-  <script type="module" crossorigin src="./assets/main-DrrFfrox.js"></script>
+  <script type="module" crossorigin src="./assets/main-Ci1zE3mG.js"></script>
 </head>
 
 <body>
 	<canvas id="webgl-canvas"></canvas>
 	<canvas id="three-canvas"></canvas>
-	<img src="./assets/IMP_LOGO_WHITE-BCHCY6Ro.png" style="position: absolute;height: 15%; top: 5%;left: 2%;">
+	<img src="./assets/IMP_LOGO_WHITE-BCHCY6Ro.png" style="position: absolute;height: 60px; top: 5%;left: 2%;">
 	<div id="entry" contenteditable="true">
 		<pre>float domain(vec3 v, float t) {
 			float val1 = sphere(v-vec3(0.0,0.0,0.0), 4.0);
@@ -97,7 +96,7 @@
 					// Call handleEntryChange whenever content changes
 					handleEntryChange();
 					window.godMaterial.fragmentShader = await window.generateFragmentShader(document.getElementById('entry').textContent);
-					window.godMaterial.needsUpdate=true;
+					window.godMaterial.needsUpdate = true;
 				}
 			});
 		});

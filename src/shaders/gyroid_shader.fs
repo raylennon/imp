@@ -18,7 +18,7 @@ vec3 grad (vec3 v) {
     (domain(vec3(v.xy,v.z+e),u_time)-local)/(1.0*e)
   );
 
-  g = g/length(g);
+  // g = g/length(g);
   return g;
 }
 void main() {
@@ -65,9 +65,11 @@ void main() {
   v_normal.z = -v_normal.z;
 
   fragColor.w *= exp(-0.0001*pow(dist, 1.6))/1.5;
-  fragColor.xyz *= 0.1 * v_normal / step_fac;
+  fragColor.xyz *= 0.2 * v_normal / step_fac;
   fragColor.xyz += 0.2;
 
   // fragColor.xyz = vec3(length(fragColor.xyz));
+
+  // fragColor.yz -= 10.0*abs(length(v_normal)-1.0);
 
 }
