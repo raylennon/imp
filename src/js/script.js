@@ -3,7 +3,7 @@
 
 // Import OrbitControls.js for camera control
 import * as THREE from 'three';
-import { OrbitControls  } from 'three/addons/controls/OrbitControls.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
 
 const scene = new THREE.Scene();
@@ -18,8 +18,8 @@ window.viewQuat = new THREE.Quaternion();
 
 const clock = new THREE.Clock();
 
-const renderer = new THREE.WebGLRenderer({canvas: document.getElementById('three-canvas'), alpha: true});
-renderer.setPixelRatio( 1/1);
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('three-canvas'), alpha: true });
+renderer.setPixelRatio(1 / 1);
 
 
 renderer.setClearColor(0xffffff); // Black background
@@ -36,7 +36,7 @@ function vertexShader() {
     varying vec2 UV; 
 
     varying vec3 vposition;
-    varying vec3 v_normal;
+    flat out vec3 v_normal;
     varying vec4 vPos;
 
     void main() {
@@ -57,14 +57,26 @@ window.generateFragmentShader = async function (domainText) {
     const preambleText = (await import('../shaders/preamble.fs?raw')).default;
     const utilitiesText = (await import('../shaders/utilities.fs?raw')).default;
     // const domainText = (await import('../shaders/domain.fs?raw')).default;
-    return preambleText+`
+    return preambleText + `
     varying vec3 vposition;
-    varying vec3 vUv;`+`\n`+utilitiesText+`\n`+domainText+`\n
-    varying vec3 v_normal;
+    varying vec3 vUv;`+ `\n` + utilitiesText + `\n` + domainText + `\n
+    flat in vec3 v_normal;
     varying vec4 vPos;
 
     vec3 v_position;
     vec3 trueCamera;
+
+    vec3 grad (vec3 v) {
+    float e = 0.0001;
+    float local = domain(v,u_time);
+    vec3 g = vec3(
+        (domain(vec3(v.x+e,v.yz),u_time)-local)/(1.0*e),
+        (domain(vec3(v.x,v.y+e,v.z),u_time)-local)/(1.0*e),
+        (domain(vec3(v.xy,v.z+e),u_time)-local)/(1.0*e)
+    );
+    // g = g/length(g);
+    return g;
+    }
 
     void main() {
 
@@ -86,7 +98,7 @@ window.generateFragmentShader = async function (domainText) {
         vec3 dir = (v_position-trueCamera);
         dir *= 1.0/length(dir);
         float step_fac = 1.0;
-        
+    
 
         float val = 0.0;
         
@@ -104,7 +116,8 @@ window.generateFragmentShader = async function (domainText) {
                 opacity = 0.0;
                 steps=10000000;
                 break;  
-            } else if (dot(v_position-trueCamera, v_position-loc)<0.0) {
+            } 
+                else if (dot(v_position-trueCamera, v_position-loc)<0.0) {
                 opacity = 1.0;
                 steps=10000000;
                 break;
@@ -114,34 +127,93 @@ window.generateFragmentShader = async function (domainText) {
             steps += 1;
         }
         dir = -dir;
-        dist = length(u_position-vposition);
-        fragColor = vec4(vec3(0.5), opacity);
-        }`
+        dist = length(u_position-vposition); 
+        `
 }
-window.godMaterial = new THREE.ShaderMaterial({
+window.gridMaterial = new THREE.ShaderMaterial({
     uniforms: {
-        colorB: {type: 'vec3', value: new THREE.Color(0xACB6E5)},
-        colorA: {type: 'vec3', value: new THREE.Color(0x74ebd5)},
-        u_position: {type: 'vec3', value: camera.position.toArray()},
-        u_time: {type: 'float', value: performance.now() / 1000.0}
+        colorB: { type: 'vec3', value: new THREE.Color(0xACB6E5) },
+        colorA: { type: 'vec3', value: new THREE.Color(0x74ebd5) },
+        u_position: { type: 'vec3', value: camera.position.toArray() },
+        u_time: { type: 'float', value: performance.now() / 1000.0 }
     },
-    fragmentShader: await window.generateFragmentShader((await import('../shaders/domain.fs?raw')).default),
+    fragmentShader: (await window.generateFragmentShader((await import('../shaders/domain.fs?raw')).default)) + `\n
+    fragColor = vec4(vec3(0.5), opacity);
+    }`,
     vertexShader: vertexShader(),
     blending: THREE.CustomBlending,
     glslVersion: THREE.GLSL3,
-    blendEquation : THREE.AddEquation 
-  })
+    blendEquation: THREE.AddEquation
+})
+window.frontMaterial = new THREE.ShaderMaterial({
+    uniforms: {
+        colorB: { type: 'vec3', value: new THREE.Color(0xACB6E5) },
+        colorA: { type: 'vec3', value: new THREE.Color(0x74ebd5) },
+        u_position: { type: 'vec3', value: camera.position.toArray() },
+        u_time: { type: 'float', value: performance.now() / 1000.0 }
+    },
+    fragmentShader: await window.generateFragmentShader((await import('../shaders/domain.fs?raw')).default) + `\n
+    
+    fragColor = ( dot(v_normal.xzy*vec3(1.0,-1.0,1.0), dir)<0.0 ) ? vec4( 1, 0, 0, 0 ) : vec4( 0, 0, 1, opacity );
+    fragColor = vec4(1.0);
+    fragColor.w = opacity*exp(-0.0001*pow(dist, 1.6))/1.5;
+    fragColor.xyz *= 0.2 * normalize(v_normal) / step_fac;
+    fragColor.xyz += 0.2;
+	}`,
+    vertexShader: vertexShader(),
+    blending: THREE.CustomBlending,
+    glslVersion: THREE.GLSL3,
+    blendEquation: THREE.AddEquation,
+    side: THREE.FrontSide,
+    transparent: true,
+    depthTest: true,
+})
 
-  const size = 30;
-  const divisions = 10;
-  
-  const gridHelper = new THREE.GridHelper( size, divisions );
-  gridHelper.material = window.godMaterial;
-  scene.add( gridHelper );
-  window.sceneObjects.push(gridHelper);
+window.backMaterial = window.frontMaterial.clone();
+window.backMaterial.side = THREE.BackSide;
+window.backMaterial.fragmentShader = await window.generateFragmentShader((await import('../shaders/domain.fs?raw')).default) + `\n
+    float new_dist = length(loc - trueCamera);
+    vec3 new_normal = -normalize(grad(loc));
+    opacity= ceil(abs(opacity-1.0));
+    fragColor = vec4( 1, 0, 0, opacity );
+    fragColor.w *= exp(-0.0001*pow(new_dist, 1.6))/1.5;
+    fragColor.xyz *= 0.2 * normalize(new_normal) / step_fac;
+    fragColor.xyz += 0.2;
+    }`;
+window.backMaterial.needsUpdate = true;
+window.backMaterial.depthTest = false;
+
+const size = 30;
+const divisions = 10;
+
+const gridHelper = new THREE.GridHelper(size, divisions);
+gridHelper.material = window.gridMaterial;
+scene.add(gridHelper);
+window.sceneObjects.push(gridHelper);
+
+const cyl_geometry = new THREE.CylinderGeometry(5, 5, 20, 32);
+const cyl_material = window.frontMaterial;
+const cyl = new THREE.Mesh(cyl_geometry, cyl_material);
+scene.add(cyl);
+window.sceneObjects.push(cyl);
+
+const cyl_back = cyl.clone();
+cyl_back.material = window.backMaterial;
+// scene.add(cyl_back);
+// window.sceneObjects.push(cyl_back);
+
+// var loader = new STLLoader();
+// loader.load( '../knot.stl', function ( geometry ) {
+//     var material = window.frontMaterial;
+//     var mesh = new THREE.Mesh( geometry, material );
+//     mesh.position.set( 0, 0, 0);
+//     scene.add( mesh );
+//     window.sceneObjects.push(mesh);
+// } );
+
 // console.log(gridHelper);
 
-const controls = new OrbitControls (camera, renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
 
 camera.position.z = 20;
 controls.update();

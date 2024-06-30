@@ -17,7 +17,6 @@ vec3 grad (vec3 v) {
     (domain(vec3(v.x,v.y+e,v.z),u_time)-local)/(1.0*e),
     (domain(vec3(v.xy,v.z+e),u_time)-local)/(1.0*e)
   );
-
   // g = g/length(g);
   return g;
 }
@@ -39,21 +38,25 @@ void main() {
   uv.x *= u_resolution.x/u_resolution.y;
   float time = u_time;
   
-  float MAX_DIST = 1000.0;
-  const int MAX_STEPS = 1000;
+  float MAX_DIST = 100.0;
+  const int MAX_STEPS = 100;
 
   vec3 loc = u_position.xzy;
   loc.y = -loc.y;
   
   vec3 dir =  vec3(uv.x, (u_resolution.x/u_resolution.y) * (u_FL/35.0)*2.0 , uv.y) * rot;
-
+  
   float dist = 0.0;
   float step_fac = 1.0/length(dir);
-  float current_sign = sign(domain(loc,u_time));
+  float camera_sign = sign(domain(loc,u_time));
+  float current_sign = camera_sign;
+
+
+
   fragColor = vec4(1.0);
   for(int i = 0; i < MAX_STEPS; i++){
     if (sign(domain(loc,u_time)) != current_sign) {
-      break;
+        break;
     } 
     dist += abs(domain(loc,u_time));
     loc = loc + step_fac*dir*abs(domain(loc,u_time));
@@ -65,7 +68,7 @@ void main() {
   v_normal.z = -v_normal.z;
 
   fragColor.w *= exp(-0.0001*pow(dist, 1.6))/1.5;
-  fragColor.xyz *= 0.2 * v_normal / step_fac;
+  fragColor.xyz *= 0.2 * normalize(v_normal) / step_fac;
   fragColor.xyz += 0.2;
 
   // fragColor.xyz = vec3(length(fragColor.xyz));

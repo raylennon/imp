@@ -97,8 +97,19 @@
 				if (mutation.type === 'childList' || mutation.type === 'characterData') {
 					// Call handleEntryChange whenever content changes
 					handleEntryChange();
-					window.godMaterial.fragmentShader = await window.generateFragmentShader(document.getElementById('entry').textContent);
-					window.godMaterial.needsUpdate = true;
+					var newShader = await window.generateFragmentShader(document.getElementById('entry').textContent);
+					window.gridMaterial.fragmentShader = newShader + `\n
+    fragColor = vec4(vec3(0.5), opacity);
+    }`
+					window.gridMaterial.needsUpdate = true;
+					window.objMaterial.fragmentShader = newShader + `\n
+    vec3 fdx = dFdx(v_position);
+    vec3 fdy = dFdy(v_position);
+    vec3 faceNormal = normalize(cross(fdx,fdy));
+    
+    fragColor = ( dot(v_normal.xzy*vec3(1.0,-1.0,1.0), dir)>0.0 ) ? vec4( 1, 0, 0, opacity ) : vec4( 0, 0, 1, 1 );
+	}`;
+					window.objMaterial.needsUpdate = true;
 				}
 			});
 		});
