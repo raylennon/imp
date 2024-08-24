@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>Imp-3D Modeller</title>
+	<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+	<link href='./styles.css' rel='stylesheet'>
+</head>
+
+<body>
+	<!-- <nav class="navbar navbar-expand-lg bg-dark navbar-dark">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="#"> <img src="../imgs/IMP_LOGO_WHITE.png"
+					style="height: 40px; top: 5%;left: 2%;">
+			</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+				data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+				aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+							aria-expanded="false">
+							File
+						</a>
+						<ul class="dropdown-menu">
+							<li><a class="dropdown-item" href="#">Action</a></li>
+							<li><a class="dropdown-item" href="#">Another action</a></li>
+							<li>
+								<hr class="dropdown-divider">
+							</li>
+							<li><a class="dropdown-item" href="#">Something else here</a></li>
+						</ul>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+							aria-expanded="false">
+							Edit
+						</a>
+						<ul class="dropdown-menu">
+							<li><a class="dropdown-item" href="#">Action</a></li>
+							<li><a class="dropdown-item" href="#">Another action</a></li>
+							<li>
+								<hr class="dropdown-divider">
+							</li>
+							<li><a class="dropdown-item" href="#">Something else here</a></li>
+						</ul>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+							aria-expanded="false">
+							View
+						</a>
+						<ul class="dropdown-menu">
+							<li><a class="dropdown-item" href="#">Greytone</a></li>
+							<li><a class="dropdown-item" href="#">Rainbow Normals</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav> -->
+	<div style="z-index: 5;">
+		<div id="entry" class="entrybox" contenteditable="true">
+			<p>
+				<pre>float domain(vec3 v, float t) {
+	float val1 = sphere(v-vec3(0.0,0.0,0.0), 4.0);
+	return val1;
+}</pre>
+			</p>
+		</div>
+	</div>
+	<canvas id="webgl-canvas"></canvas>
+	<canvas id="three-canvas"></canvas>
+	<script src="https://cdn.jsdelivr.net/npm/gl-matrix@3.4.3/gl-matrix-min.min.js"></script>
+
+	<!-- <script type="module" src="../js/bootstrap.js"></script> -->
+	<script type="module" src="../js/controls.js"></script>
+	<script type="module" src="./staging.js"></script>
+
+	<script>
+	</script>
+</body>
+
+</html>

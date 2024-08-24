@@ -1,6 +1,7 @@
 import { resolve } from 'path'
 import { defineConfig } from 'vite'
-
+import path from 'path'
+ 
 export default defineConfig ({
     build: {
       target: 'esnext',
@@ -13,5 +14,10 @@ export default defineConfig ({
             },
           },
     },
-    base: './'
+    base: './',
+    resolve: {
+      alias: {
+        '~bootstrap': path.resolve(__dirname, 'node_modules/bootstrap'),
+      }
+    },
 })

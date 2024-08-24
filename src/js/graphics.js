@@ -180,7 +180,7 @@ window.loadShaderFiles = async function (dynamicShaderPart) {
   const shader0Text = (await import('../shaders/version.fs?raw')).default;
   const shader1Text = (await import('../shaders/preamble.fs?raw')).default;
   const shader2Text = (await import('../shaders/utilities.fs?raw')).default;
-  const shader4Text = (await import('../shaders/gyroid_shader.fs?raw')).default;
+  const shader4Text = (await import('../shaders/spheretrace.fs?raw')).default;
 
   const combinedShaderCode = shader0Text + '\n' + shader1Text + '\n' + shader2Text + '\n' + dynamicShaderPart + '\n' + shader4Text;
 

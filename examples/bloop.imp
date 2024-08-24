@@ -1,0 +1,24 @@
+float cyl(vec3 v) {
+
+float wall_thickness = 0.05;
+float height = 6.0;
+float angle = -2.0*v.z * 2.0*3.1415926535/180.0;
+mat3 rotate = mat3(cos(angle),0.0,-sin(angle),0.0,1.0,0.0,sin(angle),0.0,cos(angle));
+float solid =(length((rotate*v).xy)-0.3)/2.0;
+return  max(max(solid,-v.z),v.z-height );
+}
+float domain(vec3 v, float t) {
+
+int n = 20;
+float size = 0.5;
+float sp = 2.0*3.141592/float(n);
+float an = atan(v.y,v.x);
+float id = floor(an/sp);
+    float a1 = sp*(id+0.0);
+    float a2 = sp*(id+1.0);
+    vec2 r1 = mat2(cos(a1),-sin(a1),sin(a1),cos(a1))*v.xy;
+    vec2 r2 = mat2(cos(a2),-sin(a2),sin(a2),cos(a2))*v.xy;
+
+float z = v.z;
+return min(cyl(vec3(r1,z)-vec3(3.0,0.0,0.0)),cyl(vec3(r2,z)-vec3(3.0,0.0,0.0)));
+}

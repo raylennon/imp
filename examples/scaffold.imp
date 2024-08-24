@@ -1,0 +1,9 @@
+float domain(vec3 v, float t) {
+
+float bounds = box(v, vec3(9.0));
+float s = 4.2;
+vec3 p = mod(v, s)-s/2.0;
+float cyls = smin2(smin2(length(p.xz), length(p.xy), 0.05), length(p.yz), 0.05)-0.8;
+cyls = abs(cyls)-0.2;
+return max(bounds, cyls);
+		  }

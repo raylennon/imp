@@ -153,10 +153,9 @@ window.frontMaterial = new THREE.ShaderMaterial({
         u_time: { type: 'float', value: performance.now() / 1000.0 }
     },
     fragmentShader: await window.generateFragmentShader((await import('../shaders/domain.fs?raw')).default) + `\n
-    
     fragColor = ( dot(v_normal.xzy*vec3(1.0,-1.0,1.0), dir)<0.0 ) ? vec4( 1, 0, 0, 0 ) : vec4( 0, 0, 1, opacity );
     fragColor = vec4(1.0);
-    fragColor.w = opacity*exp(-0.0001*pow(dist, 1.6))/1.5;
+    fragColor.w = opacity;
     fragColor.xyz *= 0.2 * normalize(v_normal) / step_fac;
     fragColor.xyz += 0.2;
 	}`,
@@ -164,24 +163,10 @@ window.frontMaterial = new THREE.ShaderMaterial({
     blending: THREE.CustomBlending,
     glslVersion: THREE.GLSL3,
     blendEquation: THREE.AddEquation,
-    side: THREE.FrontSide,
+    side: THREE.DoubleSide,
     transparent: true,
-    depthTest: true,
+    // wireframe: true
 })
-
-window.backMaterial = window.frontMaterial.clone();
-window.backMaterial.side = THREE.BackSide;
-window.backMaterial.fragmentShader = await window.generateFragmentShader((await import('../shaders/domain.fs?raw')).default) + `\n
-    float new_dist = length(loc - trueCamera);
-    vec3 new_normal = -normalize(grad(loc));
-    opacity= ceil(abs(opacity-1.0));
-    fragColor = vec4( 1, 0, 0, opacity );
-    fragColor.w *= exp(-0.0001*pow(new_dist, 1.6))/1.5;
-    fragColor.xyz *= 0.2 * normalize(new_normal) / step_fac;
-    fragColor.xyz += 0.2;
-    }`;
-window.backMaterial.needsUpdate = true;
-window.backMaterial.depthTest = false;
 
 const size = 30;
 const divisions = 10;
@@ -191,27 +176,8 @@ gridHelper.material = window.gridMaterial;
 scene.add(gridHelper);
 window.sceneObjects.push(gridHelper);
 
-const cyl_geometry = new THREE.CylinderGeometry(5, 5, 20, 32);
-const cyl_material = window.frontMaterial;
-const cyl = new THREE.Mesh(cyl_geometry, cyl_material);
-scene.add(cyl);
-window.sceneObjects.push(cyl);
 
-const cyl_back = cyl.clone();
-cyl_back.material = window.backMaterial;
-// scene.add(cyl_back);
-// window.sceneObjects.push(cyl_back);
-
-// var loader = new STLLoader();
-// loader.load( '../knot.stl', function ( geometry ) {
-//     var material = window.frontMaterial;
-//     var mesh = new THREE.Mesh( geometry, material );
-//     mesh.position.set( 0, 0, 0);
-//     scene.add( mesh );
-//     window.sceneObjects.push(mesh);
-// } );
-
-// console.log(gridHelper);
+window.loader = new STLLoader();
 
 const controls = new OrbitControls(camera, renderer.domElement);
 
@@ -237,5 +203,57 @@ function animate() {
         }
     }
 }
-// startGraphics();
 animate();
+
+
+// var dropZone = document.getElementById('stlDrop');
+// dropZone.addEventListener('dragover', function (event) {
+//     event.preventDefault();
+//     event.dataTransfer.dropEffect = 'copy';
+// });
+// document.addEventListener('dragover', function (event) {
+
+//     event.preventDefault();
+//     event.dataTransfer.dropEffect = 'copy';
+
+// });
+
+// function addSTL(file) {
+//     if (file && file.name.endsWith('.stl')) {
+//         var reader = new FileReader();
+//         reader.onload = function (e) {
+//             var contents = e.target.result;
+//             var geometry = window.loader.parse(contents);
+//             var material = window.frontMaterial;
+//             var mesh = new THREE.Mesh(geometry, material);
+//             mesh.position.set(0, 0, 0);
+//             scene.add(mesh);
+//             window.sceneObjects.push(mesh);
+//         };
+//         reader.readAsArrayBuffer(file);
+//     } else {
+//         console.log(event.dataTransfer.files);
+//         alert('Please drop an STL file.');
+//     }
+//     document.getElementById("meshmenu").innerHTML += [`<div class="mesh">
+// 			<p>
+// 				<span style="height: 100%; width: 100px">`, file.name.substring(0, file.name.length-4), `</span>
+// 				<img src="./view.png" class="icon">
+// 				<img src="./SDFify.png" class="icon">
+// 				<img src="./bin.png" class="icon danger">
+// 			</p>
+// 		</div>`].join("");
+//     document.getElementById("meshmenu").style.visibility = "visible";
+// }
+
+// dropZone.addEventListener('drop', function (event) {
+//     event.preventDefault();
+//     var file = event.dataTransfer.files[0];
+//     addSTL(file);
+// });
+// dropZone.addEventListener('change', function (e) {
+//     var file = e.target.files[0]
+//     if (file && file.name.endsWith('.stl')) {
+//         addSTL(file);
+//     }
+// });

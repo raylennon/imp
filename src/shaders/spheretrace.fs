@@ -1,14 +1,3 @@
-float udBox( vec3 p, vec3 b )
-{
-  return length(max(abs(p)-b,0.0));
-}
-
-vec2 matcap(vec3 eye, vec3 normal) {
-  vec3 reflected = reflect(-eye, normal);
-  float m = 2.8284271247461903 * sqrt( abs(reflected.y)+1.0 );
-  return reflected.xz / m + 0.5;
-}
-
 vec3 grad (vec3 v) {
   float e = 0.0001;
   float local = domain(v,u_time);
@@ -17,7 +6,6 @@ vec3 grad (vec3 v) {
     (domain(vec3(v.x,v.y+e,v.z),u_time)-local)/(1.0*e),
     (domain(vec3(v.xy,v.z+e),u_time)-local)/(1.0*e)
   );
-  // g = g/length(g);
   return g;
 }
 void main() {
@@ -73,6 +61,6 @@ void main() {
 
   // fragColor.xyz = vec3(length(fragColor.xyz));
 
-  // fragColor.yz -= 10.0*abs(length(v_normal)-1.0);
+  // fragColor.yz -= 1.0*abs(length(v_normal)-1.0);
 
 }

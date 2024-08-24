@@ -5,87 +5,91 @@
 	<meta charset="utf-8">
 	<title>Imp-3D Modeller</title>
 	<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
-	<style>
-		html {
-			height: 100%;
-		}
-
-		body {
-			margin: 0;
-			min-height: 100%;
-			background-color: transparent !important;
-			background-image: radial-gradient(rgb(59, 59, 59), rgb(4, 4, 4));
-		}
-
-		canvas {
-			position: absolute;
-			right: 0;
-			width: 100%;
-			height: 100%;
-			image-rendering: pixelated
-		}
-
-		p {
-			padding-top: 6px;
-		}
-
-		#entry {
-			/* background-color: rgba(54, 54, 54, 0.206); */
-			color: darkgray;
-			font-family: 'Roboto', sans-serif;
-			font-size: large;
-
-			border: none !important;
-
-			/* border-radius: 30px; */
-			/* border-style: solid; */
-			/* pointer-events: none; */
-
-			-webkit-touch-callout: none;
-			-webkit-user-select: none;
-			-khtml-user-select: none;
-			-moz-user-select: none;
-			-ms-user-select: none;
-			user-select: none;
-			/* text-align: center; */
-			vertical-align: middle;
-			position: absolute;
-			width: 25%;
-			/* height: 80%; */
-			z-index: 5;
-			top: 15%;
-			left: 2%
-				/* visibility: hidden; */
-		}
-
-		#entry:focus {
-			color: white;
-			outline: none;
-		}
-	</style>
 </head>
 
 <body>
+	<nav class="navbar navbar-expand-lg bg-dark navbar-dark">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="#"> <img src="imgs/IMP_LOGO_WHITE.png"
+					style="height: 40px; top: 5%;left: 2%;">
+			</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+				data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+				aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+							aria-expanded="false">
+							File
+						</a>
+						<ul class="dropdown-menu">
+							<li><a class="dropdown-item" href="#">Action</a></li>
+							<li><a class="dropdown-item" href="#">Another action</a></li>
+							<li>
+								<hr class="dropdown-divider">
+							</li>
+							<li><a class="dropdown-item" href="#">Something else here</a></li>
+						</ul>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+							aria-expanded="false">
+							Edit
+						</a>
+						<ul class="dropdown-menu">
+							<li><a class="dropdown-item" href="#">Action</a></li>
+							<li><a class="dropdown-item" href="#">Another action</a></li>
+							<li>
+								<hr class="dropdown-divider">
+							</li>
+							<li><a class="dropdown-item" href="#">Something else here</a></li>
+						</ul>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+							aria-expanded="false">
+							View
+						</a>
+						<ul class="dropdown-menu">
+							<li><a class="dropdown-item" href="#">Greytone</a></li>
+							<li><a class="dropdown-item" href="#">Rainbow Normals</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<div style="z-index: 5;">
+		<div id="entry" class="entrybox" contenteditable="true">
+			<p>
+			<pre>float domain(vec3 v, float t) {
+	float val1 = sphere(v-vec3(0.0,0.0,0.0), 4.0);
+	return smin2(val1, box(v-vec3(3, 3, 3), vec3(2.0, 2.0, 2.0)), 0.2);
+}</pre>
+			</p>
+		</div>
+	</div>
+	<!-- <div class="dragTarget" id="stlDrop"><input type="file"
+		style="opacity: 0.0; position: absolute; top: 0px; left: 0; bottom: 0; right: 0; width: 100%; height:100%;" />
+	</div> -->
+	<!-- <div class="meshesContainer" id="meshmenu">
+		<button type="button" class="btn btn-light z-3" onclick="window.mesh()">Light</button>
+
+	</div> -->
 	<canvas id="webgl-canvas"></canvas>
 	<canvas id="three-canvas"></canvas>
-	<img src="IMP_LOGO_WHITE.png" style="position: absolute;height: 60px; top: 5%;left: 2%;">
-	<div id="entry" contenteditable="true">
-		<pre>float domain(vec3 v, float t) {
-			float val1 = sphere(v-vec3(0.0,0.0,0.0), 4.0);
-			return smin2(val1, box(v-vec3(3, 3, 3), vec3(2.0, 2.0, 2.0)), 0.2);
-		  }</pre>
-	</div>
-
 	<script src="https://cdn.jsdelivr.net/npm/gl-matrix@3.4.3/gl-matrix-min.min.js"></script>
 
+	<script type="module" src="./js/bootstrap.js"></script>
 	<script type="module" src="./js/graphics.js"></script>
 	<script type="module" src="./js/controls.js"></script>
 	<script type="module" src="./js/script.js"></script>
+	<script type="module" src="./js/createmesh.js"></script>
 	<script>
 
 		function handleEntryChange() {
 			window.updateShader(); // Call your updateShader function here
-			// console.log(window.generateFragmentShader(document.getElementById('entry').textContent));
 		}
 
 		// Select the 'entry' div
@@ -102,14 +106,15 @@
     fragColor = vec4(vec3(0.5), opacity);
     }`
 					window.gridMaterial.needsUpdate = true;
-					window.objMaterial.fragmentShader = newShader + `\n
-    vec3 fdx = dFdx(v_position);
-    vec3 fdy = dFdy(v_position);
-    vec3 faceNormal = normalize(cross(fdx,fdy));
-    
-    fragColor = ( dot(v_normal.xzy*vec3(1.0,-1.0,1.0), dir)>0.0 ) ? vec4( 1, 0, 0, opacity ) : vec4( 0, 0, 1, 1 );
+					window.frontMaterial.fragmentShader = newShader + `\n
+    fragColor = ( dot(v_normal.xzy*vec3(1.0,-1.0,1.0), dir)<0.0 ) ? vec4( 1, 0, 0, 0 ) : vec4( 0, 0, 1, opacity );
+    fragColor = vec4(1.0);
+    fragColor.w = opacity;
+    fragColor.xyz *= 0.2 * normalize(v_normal) / step_fac;
+    fragColor.xyz += 0.2;
+    /*fragColor.xyz  = vec3(length(fragColor.xyz));*/
 	}`;
-					window.objMaterial.needsUpdate = true;
+					window.frontMaterial.needsUpdate = true;
 				}
 			});
 		});
@@ -126,7 +131,13 @@
 			gl_renderer.render();
 			window.updateShader();
 			window.updateShader();
-		});	  
+		});
+		document.addEventListener('keydown', function (event) {
+			if (event.key === '`') {
+				window.mesh();
+			}
+		});
+
 	</script>
 </body>
 
