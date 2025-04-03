@@ -1,0 +1,22 @@
+
+float weave(vec3 v, float s) {
+
+    vec2 id = round(v.xz/s);
+    vec2 r = v.xz - s*id;
+    vec3 m = vec3( ((int(id.x)&1)==0) ? r.x : -r.x,
+                ((int(id.y)&1)==0) ? v.y : -v.y, 
+                ((int(id.y)&1)==0) ? r.y : -r.y);
+        v =m;
+        float s2 = s/2.;
+        v.x += s2;
+        vec2 T = vec2(s2, s2/2.);
+        float q1 = max(length(vec2(length(v.xy)-T.x,v.z))-T.y, v.y);
+        v.x -= 2.*s2;
+        float q2 = max(length(vec2(length(v.xy)-T.x,v.z))-T.y, -v.y);
+    return (max(max(min(q1, q2), v.x), -(v.x+2.*s2)))/2.;
+}
+
+float domain (vec3 v, float t) {
+    float s= 1.;
+    return min(weave(v,s), weave(v.zyx+vec3(s/2., 0., s/2.),s));
+}

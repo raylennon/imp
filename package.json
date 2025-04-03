@@ -1,0 +1,22 @@
+{
+  "name": "imp",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "sass": "1.77.6",
+    "vite": "^5.4.1",
+    "vite-plugin-monaco-editor": "^1.1.0"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.3.3",
+    "split.js": "^1.6.5",
+    "three": "github:raylennon/three.js"
+  }
+}

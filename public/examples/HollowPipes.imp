@@ -1,0 +1,13 @@
+float domain(vec3 v, float t) {
+    float r = 0.2;
+    float fac = 5.0;
+
+    vec3 i = round(v/(r*fac));
+    v -= i*(r*fac);
+
+    float cyl1 = length(v.xy)-r;
+    float cyl2 = length(v.yz)-r;
+    float cyl3 = length(v.zx)-r;
+
+    return abs(smin2(smin2(cyl1, cyl2, 0.1*r), cyl3, 0.1*r))-r/4.;
+}

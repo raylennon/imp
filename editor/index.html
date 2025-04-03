@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IMP 3D Modeller</title>
+  <!-- <link rel="stylesheet" data-name="vs/editor/editor.main"
+    href="../node_modules/monaco-editor/min/vs/editor/editor.main.css" /> -->
+  <style type="text/css">
+    html,
+    body {
+      height: 100%;
+    }
+
+    #draw {
+      position: relative;
+      height: 100%;
+      width: 100%;
+      left: 0;
+      top: 0;
+      z-index: -1;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      outline: none;
+      -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+      /* mobile webkit */
+    }
+  </style>
+  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+
+</head>
+
+<body data-bs-theme="dark">
+  <div id="nav-placeholder"></div>
+  <div class="hsplit">
+    <div id="left">
+      <div class="vsplit">
+        <div id="editor"></div>
+        <div id="imported" style="overflow-y: auto;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Type</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div id="drawarea" style="display: flex; flex-direction: row;">
+      <canvas id="draw" tabindex='1' unselectable="on"></canvas>
+    </div>
+  </div>
+  <script>
+
+    $("#nav-placeholder").load("/navbar.html", function() {
+      populateExamples();
+    })
+    async function fetchFilesFromDirectory(directoryPath) {
+      try {
+        const response = await fetch(directoryPath);
+        const text = await response.text();
+        const parser = new DOMParser();
+        const htmlDocument = parser.parseFromString(text, 'text/html');
+        const links = htmlDocument.querySelectorAll('a');
+        const files = Array.from(links)
+        .map(link => link.getAttribute('href'))
+        .filter(href => href.endsWith('.imp'))
+        .map(href => href.split('/').pop().replace('.imp', ''));
+        return files;
+      } catch (error) {
+        console.error('Error fetching files:', error);
+        return [];
+      }
+    }
+    // Function to populate the "examples" element
+    async function populateExamples() {
+      const examplesElement = document.getElementById('examples');
+      console.log(examplesElement);
+      if (!examplesElement) return;
+      const directoryPath = '/examples/list.html';
+      const files = await fetchFilesFromDirectory(directoryPath);
+      files.forEach(fileName => {
+        const liElement = document.createElement('li');
+        const aElement = document.createElement('a');
+        aElement.className = 'dropdown-item';
+        aElement.href = '#';
+        aElement.textContent = fileName;
+        aElement.onclick = () => window.addCube();
+        liElement.appendChild(aElement);
+        examplesElement.appendChild(liElement);
+      });
+    }
+
+
+  </script>
+  <script type="module" src="../js/universal.js"> </script>
+
+  <!-- Editor stuff -->
+
+  <script type="module">
+    import * as monaco from 'monaco-editor';
+
+    try {
+      window.editor = monaco.editor.create(document.getElementById('editor'), {
+        value: '',
+        language: 'cpp',
+        theme: 'vs-dark',
+        wordWrap: "on",
+        automaticLayout: true,
+      });
+      console.log("editor is");
+      console.log(editor);
+      monaco.editor.updateOptions({});
+    } catch (e) {
+      //pass
+    }
+  </script>
+
+
+  <script type="module" src="js/lib/MarchingCubes.js"></script>
+  <!-- <script type="module" src="js/editor.js"></script> -->
+  <script type="module" src="js/splitter.js"></script>
+  <script type="module" src="js/setup.js"> </script>
+
+
+</body>
+
+</html>

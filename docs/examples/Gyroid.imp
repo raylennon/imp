@@ -1,0 +1,6 @@
+float domain(vec3 v, float t) {
+    float s = 5.0;
+    v*= s;
+    float val = (sin(v.x)*cos(v.y)+sin(v.y)*cos(v.z)+sin(v.z)*cos(v.x)) / (1.7*s);
+    return abs(val)-0.09; 
+}

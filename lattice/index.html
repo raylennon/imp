@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IMP 3D Modeller</title>
+    <link rel="stylesheet" data-name="vs/editor/editor.main"
+        href="../node_modules/monaco-editor/min/vs/editor/editor.main.css" />
+    <style type="text/css">
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            overflow:hidden;
+            background-image: radial-gradient(#3b3b3b,#040404);
+
+        }
+
+        canvas {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            left: 0;
+            top: 0;
+            z-index: -1;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+
+</head>
+
+<body data-bs-theme="dark">
+    <!-- <div id="nav-placeholder"></div> -->
+    <!-- </div> -->
+    <canvas id="draw"></canvas>
+    <script>
+        $(function () {
+            $("#nav-placeholder").load("/navbar.html");
+        });
+        
+        </script>
+    <script type="module" src="../js/universal.js"> </script>
+    <script type="module" src="./js/script.js"> </script>
+</body>
+
+</html>
