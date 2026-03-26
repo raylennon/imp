@@ -1,0 +1,14 @@
+float domain(vec3 v, float t) {
+    float s =2.*3.15159265;
+    vec3 v1 = v;
+    float c = 0.33;
+    v1 = v + vec3(c,0.,-c);
+    v1 = s * v1;
+    float g = dot(cos(v1), sin(v1.yzx))/(1.7*s);
+    g = abs(g)-0.2/s;
+
+    float r = 0.05;
+    float l = length(v- vec3(1./sqrt(3.))* (dot(v, vec3(1./sqrt(3.)))));
+    
+    return min(max(length(v)-1.,l-r), max(g, length(v)-0.6));
+}
